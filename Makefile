@@ -1,4 +1,4 @@
-.PHONY: dev prod dev-build prod-build dev-down prod-down logs clean db-init
+.PHONY: dev prod dev-build prod-build dev-down prod-down logs clean db-init db-init-sql
 
 # Development commands
 dev:
@@ -92,6 +92,9 @@ db-check:
 	@echo "=== Vendor-Projects relationships ==="
 	docker compose exec supabase-db psql -U postgres -d supabase -c "SELECT * FROM vendor_projects LIMIT 5;"
 
+db-init-sql:
+	@echo "Running init.sql on supabase-db..."
+	docker compose exec supabase-db psql -U postgres -d supabase -f /docker-entrypoint-initdb.d/01-init.sql
 
 # Help
 help:
@@ -111,4 +114,5 @@ help:
 	@echo "  db-reset     - Reset development database"
 	@echo "  db-backup    - Backup development database"
 	@echo "  db-check     - Check database tables and sample data"
+	@echo "  db-init-sql  - Run init.sql on supabase-db"
 	@echo "  help         - Show this help message"
