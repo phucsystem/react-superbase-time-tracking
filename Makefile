@@ -16,15 +16,15 @@ dev-down:
 # Production commands
 prod:
 	@echo "Starting production environment..."
-	docker compose -f docker-compose-production.yml up
+	docker compose -f docker-compose.prod.yml up
 
 prod-build:
 	@echo "Building and starting production environment..."
-	docker compose -f docker-compose-production.yml up --build
+	docker compose -f docker-compose.prod.yml up --build
 
 prod-down:
 	@echo "Stopping production environment..."
-	docker compose -f docker-compose-production.yml down
+	docker compose -f docker-compose.prod.yml down
 
 # Utility commands
 logs:
@@ -33,12 +33,12 @@ logs:
 
 logs-prod:
 	@echo "Showing logs for production environment..."
-	docker compose -f docker-compose-production.yml logs -f
+	docker compose -f docker-compose.prod.yml logs -f
 
 clean:
 	@echo "Cleaning up Docker resources..."
 	docker compose down -v
-	docker compose -f docker-compose-production.yml down -v
+	docker compose -f docker-compose.prod.yml down -v
 	docker system prune -f
 
 setup-dev:
