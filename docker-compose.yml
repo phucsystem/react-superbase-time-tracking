@@ -1,4 +1,18 @@
 services:
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - supabase-rest
+      - app-dev
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   # Frontend Development
   app-dev:
     build:

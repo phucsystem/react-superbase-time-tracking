@@ -20,8 +20,7 @@ A React TypeScript application with Supabase backend for tracking development ve
 ├── docker-compose.yml         # Development environment
 ├── docker-compose-production.yml # Production environment
 ├── Makefile                   # Convenience commands
-├── .env.development           # Development environment variables
-├── .env.production.example    # Production environment template
+├── .env.example           # Development environment variables
 └── README.md                  # Project documentation
 ```
 
@@ -54,7 +53,7 @@ A React TypeScript application with Supabase backend for tracking development ve
    make setup-dev
 
    # Or manually
-   cp .env.development .env
+   cp .env.example .env
    docker-compose up --build
    ```
 
@@ -109,7 +108,7 @@ make help             # Show all commands
 
 ```bash
 # Development
-docker-compose --env-file .env.development up --build
+docker-compose up --build
 docker-compose down
 
 # Production
@@ -148,12 +147,6 @@ See `supabase/README.md` for detailed schema information.
 
 ## Environment Variables
 
-### Development (.env.development)
-- Uses default local Supabase configuration
-- Pre-configured with demo JWT secrets
-- Includes sample data seeding
-
-### Production (.env.production)
 - **VITE_SUPABASE_URL**: Your Supabase project URL
 - **VITE_SUPABASE_ANON_KEY**: Your Supabase anonymous key
 - **JWT_SECRET**: Secure JWT secret (32+ characters)

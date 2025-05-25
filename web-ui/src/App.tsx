@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
 import Tasks from './pages/Tasks'
+import LogWork from './pages/LogWork'
 import Vendors from './pages/Vendors'
 import Projects from './pages/Projects'
 import Reports from './pages/Reports'
@@ -15,6 +16,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/tasks" element={<Tasks />} />
+            <Route path="/log-work" element={<LogWork />} />
             <Route path="/vendors" element={<Vendors />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/reports" element={<Reports />} />

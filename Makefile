@@ -43,7 +43,7 @@ clean:
 
 setup-dev:
 	@echo "Setting up development environment..."
-	cp .env.development .env
+	cp .env.example .env
 	@echo "Development environment file created. Starting services..."
 	make dev-build
 

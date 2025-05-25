@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Play, Pause, Square } from 'lucide-react'
 import { Task, TimeEntry } from '../types'
 import { supabase } from '../utils/supabase'
-import Timer from '../components/Timer'
 import TaskList from '../components/TaskList'
 import RecentEntries from '../components/RecentEntries'
 
@@ -140,11 +138,6 @@ const Dashboard = () => {
     <div className="max-w-6xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
       
-      <Timer
-        activeEntry={activeEntry}
-        onStop={stopTimer}
-      />
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Tasks</h2>

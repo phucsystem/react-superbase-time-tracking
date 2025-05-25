@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Clock, CheckSquare, BarChart3, Users, FolderOpen } from 'lucide-react'
+import { Clock, CheckSquare, BarChart3, Users, FolderOpen, FileText } from 'lucide-react'
 
 const Navbar = () => {
   const location = useLocation()
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: Clock },
+    { path: '/log-work', label: 'My Log Work', icon: FileText },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
     { path: '/vendors', label: 'Vendors', icon: Users },
     { path: '/projects', label: 'Projects', icon: FolderOpen },

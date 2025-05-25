@@ -5,7 +5,8 @@
       "Bash(mv:*)",
       "Bash(rmdir:*)",
       "Bash(ls:*)",
-      "Bash(docker system prune:*)"
+      "Bash(docker system prune:*)",
+      "Bash(docker-compose restart:*)"
     ],
     "deny": []
   }
