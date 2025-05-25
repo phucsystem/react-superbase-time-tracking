@@ -83,8 +83,8 @@ services:
       GOTRUE_JWT_EXP: 3600
       GOTRUE_JWT_AUD: authenticated
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
-      GOTRUE_DISABLE_SIGNUP: false
-      GOTRUE_EXTERNAL_EMAIL_DISABLED: true
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_EXTERNAL_EMAIL_DISABLED: "true"
       API_EXTERNAL_URL: http://your-domain.com:54321
     ports:
       - "54321:9999"
