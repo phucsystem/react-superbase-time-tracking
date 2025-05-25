@@ -1,8 +1,11 @@
-import { Link, useLocation } from 'react-router-dom'
-import { Clock, CheckSquare, BarChart3, Users, FolderOpen, FileText } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Clock, CheckSquare, BarChart3, Users, FolderOpen, FileText, LogOut } from 'lucide-react'
+import { useAuth } from '../hooks/useAuth'
 
 const Navbar = () => {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, signOut } = useAuth()
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: Clock },
@@ -13,6 +16,11 @@ const Navbar = () => {
     { path: '/reports', label: 'Reports', icon: BarChart3 },
   ]
 
+  const handleLogout = async () => {
+    await signOut()
+    navigate('/login')
+  }
+
   return (
     <nav className="bg-white shadow-lg">
       <div className="container mx-auto px-4">
@@ -21,7 +29,7 @@ const Navbar = () => {
             <Clock className="h-8 w-8 text-blue-600" />
             <span className="text-xl font-bold text-gray-800">TimeTracker</span>
           </div>
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 items-center">
             {navItems.map(({ path, label, icon: Icon }) => (
               <Link
                 key={path}
@@ -36,6 +44,15 @@ const Navbar = () => {
                 <span>{label}</span>
               </Link>
             ))}
+            {user && (
+              <button
+                onClick={handleLogout}
+                className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

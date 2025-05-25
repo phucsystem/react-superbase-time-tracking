@@ -28,7 +28,24 @@ $$;
 -- Grant usage on schema
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 
+
+-- Enable required extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Create auth schema and tables
 CREATE SCHEMA IF NOT EXISTS auth;
+
+-- Auth users table
+-- Removed manual creation of auth.users table. Supabase Auth manages this schema and table automatically.
+
+-- Auth refresh tokens table
+-- Removed manual creation of auth.refresh_tokens table. Supabase Auth manages this schema and table automatically.
+
+-- Grant permissions
+GRANT USAGE ON SCHEMA auth TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA auth TO postgres, service_role;
+GRANT SELECT ON ALL TABLES IN SCHEMA auth TO anon, authenticated;
 
 -- Create vendors table
 CREATE TABLE IF NOT EXISTS vendors (
@@ -123,30 +140,11 @@ CREATE INDEX IF NOT EXISTS idx_time_entries_start_time ON time_entries(start_tim
 -- Row Level Security (RLS) - DISABLED FOR DEVELOPMENT
 -- =========================================
 
--- Note: RLS is disabled for development with plain PostgreSQL
--- For production with Supabase, enable RLS and create appropriate policies
-
--- ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE vendor_projects ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE time_entries ENABLE ROW LEVEL SECURITY;
-
--- Example policies for production Supabase setup:
--- CREATE POLICY "Allow all operations for authenticated users" ON vendors
---   FOR ALL USING (auth.role() = 'authenticated');
-
--- CREATE POLICY "Allow all operations for authenticated users" ON projects
---   FOR ALL USING (auth.role() = 'authenticated');
-
--- CREATE POLICY "Allow all operations for authenticated users" ON vendor_projects
---   FOR ALL USING (auth.role() = 'authenticated');
-
--- CREATE POLICY "Allow all operations for authenticated users" ON tasks
---   FOR ALL USING (auth.role() = 'authenticated');
-
--- CREATE POLICY "Allow all operations for authenticated users" ON time_entries
---   FOR ALL USING (auth.role() = 'authenticated');
+ALTER TABLE projects DISABLE ROW LEVEL SECURITY;
+ALTER TABLE vendors DISABLE ROW LEVEL SECURITY;
+ALTER TABLE tasks DISABLE ROW LEVEL SECURITY;
+ALTER TABLE time_entries DISABLE ROW LEVEL SECURITY;
+ALTER TABLE vendor_projects DISABLE ROW LEVEL SECURITY;
 
 -- =========================================
 -- Sample Data
@@ -192,3 +190,17 @@ INSERT INTO time_entries (task_id, vendor_id, start_time, end_time, duration, de
   ('660e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440000', '2024-01-16 10:00:00+00', '2024-01-16 14:00:00+00', 14400, 'Payment API integration'),
   ('660e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440001', '2024-01-16 09:00:00+00', '2024-01-16 13:00:00+00', 14400, 'Mobile wireframe design'),
   ('660e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440002', '2024-01-17 08:00:00+00', '2024-01-17 11:30:00+00', 12600, 'Database performance analysis');
+
+-- =========================================
+-- Grant permissions to PostgREST roles
+-- =========================================
+
+-- Grant all permissions to anon and authenticated roles
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated, service_role;
+
+-- Grant default privileges for future objects
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon, authenticated, service_role;

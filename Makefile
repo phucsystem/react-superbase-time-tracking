@@ -1,4 +1,4 @@
-.PHONY: dev prod dev-build prod-build dev-down prod-down logs clean db-init db-init-sql
+.PHONY: dev prod dev-build prod-build dev-down prod-down logs clean db-init db-init-sql init-admin-user
 
 # Development commands
 dev:
@@ -81,17 +81,6 @@ db-backup:
 	@echo "Creating database backup..."
 	docker compose exec supabase-db pg_dump -U postgres supabase > backup_$(shell date +%Y%m%d_%H%M%S).sql
 
-db-check:
-	@echo "Checking database tables and data..."
-	@echo "=== Tables in database ==="
-	docker compose exec supabase-db psql -U postgres -d supabase -c "\dt"
-	@echo "=== Projects table ==="
-	docker compose exec supabase-db psql -U postgres -d supabase -c "SELECT * FROM projects LIMIT 5;"
-	@echo "=== Vendors table ==="
-	docker compose exec supabase-db psql -U postgres -d supabase -c "SELECT * FROM vendors LIMIT 5;"
-	@echo "=== Vendor-Projects relationships ==="
-	docker compose exec supabase-db psql -U postgres -d supabase -c "SELECT * FROM vendor_projects LIMIT 5;"
-
 db-init-sql:
 	@echo "Running init.sql on supabase-db..."
 	docker compose exec supabase-db psql -U postgres -d supabase -f /docker-entrypoint-initdb.d/01-init.sql
@@ -115,4 +104,9 @@ help:
 	@echo "  db-backup    - Backup development database"
 	@echo "  db-check     - Check database tables and sample data"
 	@echo "  db-init-sql  - Run init.sql on supabase-db"
+	@echo "  init-admin-user - Run admin user initialization script"
 	@echo "  help         - Show this help message"
+
+init-admin-user:
+	@if [ ! -f .env ]; then echo "Error: .env file not found"; exit 1; fi
+	@export $$(grep -v '^#' .env | xargs) && node ./scripts/init-admin-user.js
