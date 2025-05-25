@@ -19,6 +19,9 @@ services:
     build:
       context: ./web-ui
       dockerfile: Dockerfile.prod
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
     container_name: time-tracking-app
     environment:
       - NODE_ENV=production

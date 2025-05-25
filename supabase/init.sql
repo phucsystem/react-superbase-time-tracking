@@ -1,6 +1,14 @@
 -- =========================================
--- Time Tracking Database Schema
+-- Time Tracking Database Schema  
 -- =========================================
+
+-- Create roles for PostgREST
+CREATE ROLE IF NOT EXISTS anon NOLOGIN;
+CREATE ROLE IF NOT EXISTS authenticated NOLOGIN;
+CREATE ROLE IF NOT EXISTS service_role NOLOGIN;
+
+-- Grant usage on schema
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 
 CREATE SCHEMA IF NOT EXISTS auth;
 
