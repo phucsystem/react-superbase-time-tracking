@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS vendors (
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   rate_per_hour DECIMAL(10,2),
+  password VARCHAR(255),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -152,10 +153,10 @@ CREATE INDEX IF NOT EXISTS idx_time_entries_start_time ON time_entries(start_tim
 -- =========================================
 
 -- Insert sample vendors
-INSERT INTO vendors (id, name, email, rate_per_hour) VALUES 
-  ('550e8400-e29b-41d4-a716-446655440000', 'John Developer', 'john@example.com', 75.00),
-  ('550e8400-e29b-41d4-a716-446655440001', 'Jane Designer', 'jane@example.com', 60.00),
-  ('550e8400-e29b-41d4-a716-446655440002', 'Bob Consultant', 'bob@example.com', 90.00)
+INSERT INTO vendors (id, name, email, rate_per_hour, password) VALUES 
+  ('550e8400-e29b-41d4-a716-446655440000', 'John Developer', 'john@example.com', 75.00, 'password123'),
+  ('550e8400-e29b-41d4-a716-446655440001', 'Jane Designer', 'jane@example.com', 60.00, 'password123'),
+  ('550e8400-e29b-41d4-a716-446655440002', 'Bob Consultant', 'bob@example.com', 90.00, 'password123')
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert sample projects

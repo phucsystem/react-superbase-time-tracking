@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { Vendor, Project } from '../types'
 import { supabase } from '../utils/supabase'
@@ -14,6 +14,7 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
     name: '',
     email: '',
     rate_per_hour: '',
+    password: '',
   })
   const [selectedProjects, setSelectedProjects] = useState<string[]>([])
   const [availableProjects, setAvailableProjects] = useState<Project[]>([])
@@ -26,8 +27,9 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
         name: vendor.name,
         email: vendor.email,
         rate_per_hour: vendor.rate_per_hour?.toString() || '',
+        password: '',
       })
-      setSelectedProjects(vendor.projects?.map(p => p.id) || [])
+      setSelectedProjects(vendor.projects?.map((p: Project) => p.id) || [])
     }
   }, [vendor])
 
@@ -47,22 +49,25 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
   }
 
   const handleProjectToggle = (projectId: string) => {
-    setSelectedProjects(prev => 
+    setSelectedProjects((prev: string[]) =>
       prev.includes(projectId)
-        ? prev.filter(id => id !== projectId)
+        ? prev.filter((id: string) => id !== projectId)
         : [...prev, projectId]
     )
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      const vendorData = {
+      const vendorData: any = {
         name: formData.name,
         email: formData.email,
         rate_per_hour: formData.rate_per_hour ? parseFloat(formData.rate_per_hour) : null,
+      }
+      if (!vendor && formData.password) {
+        vendorData.password = formData.password
       }
 
       let vendorId: string
@@ -73,7 +78,6 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
           .from('vendors')
           .update(vendorData)
           .eq('id', vendor.id)
-
         if (error) throw error
         vendorId = vendor.id
       } else {
@@ -83,7 +87,6 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
           .insert([vendorData])
           .select()
           .single()
-
         if (error) throw error
         vendorId = data.id
       }
@@ -99,7 +102,7 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
 
       // Insert new relationships
       if (selectedProjects.length > 0) {
-        const relationships = selectedProjects.map(projectId => ({
+        const relationships = selectedProjects.map((projectId: string) => ({
           vendor_id: vendorId,
           project_id: projectId
         }))
@@ -176,6 +179,20 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password {vendor ? '' : '*'}
+            </label>
+            <input
+              type="password"
+              required={!vendor}
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={vendor ? 'Leave blank to keep unchanged' : ''}
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Assigned Projects
             </label>
@@ -184,7 +201,7 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
                 <p className="text-gray-500 text-sm">No active projects available</p>
               ) : (
                 <div className="space-y-2">
-                  {availableProjects.map((project) => (
+                  {availableProjects.map((project: Project) => (
                     <label key={project.id} className="flex items-center space-x-2">
                       <input
                         type="checkbox"

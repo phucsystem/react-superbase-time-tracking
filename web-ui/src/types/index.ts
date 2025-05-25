@@ -13,6 +13,7 @@ export interface Vendor {
   name: string
   email: string
   rate_per_hour?: number
+  password?: string
   created_at: string
   updated_at: string
   projects?: Project[]
