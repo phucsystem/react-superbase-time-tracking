@@ -18,7 +18,7 @@ A React TypeScript application with Supabase backend for tracking development ve
 │   ├── seed.sql               # Sample data
 │   └── init.sql               # Legacy database setup
 ├── docker-compose.yml         # Development environment
-├── docker-compose-production.yml # Production environment
+├── docker-compose.prod.yml    # Production environment
 ├── Makefile                   # Convenience commands
 ├── .env.example           # Development environment variables
 └── README.md                  # Project documentation
@@ -77,7 +77,7 @@ A React TypeScript application with Supabase backend for tracking development ve
    make setup-prod
 
    # Or manually
-   docker-compose -f docker-compose-production.yml --env-file .env.production up --build
+   docker-compose -f docker-compose.prod.yml --env-file .env.production up --build
    ```
 
 ## Available Commands
@@ -112,8 +112,8 @@ docker-compose up --build
 docker-compose down
 
 # Production
-docker-compose -f docker-compose-production.yml --env-file .env.production up --build
-docker-compose -f docker-compose-production.yml down
+docker-compose -f docker-compose.prod.yml --env-file .env.production up --build
+docker-compose -f docker-compose.prod.yml down
 ```
 
 ## Development Features
