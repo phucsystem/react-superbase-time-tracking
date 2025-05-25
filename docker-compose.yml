@@ -11,8 +11,8 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL:-http://localhost:54322}
-      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0}
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
     depends_on:
       supabase-db:
         condition: service_healthy
@@ -45,7 +45,7 @@ services:
       PGRST_DB_URI: postgres://postgres:postgres@supabase-db:5432/supabase
       PGRST_DB_SCHEMAS: public
       PGRST_DB_ANON_ROLE: postgres
-      PGRST_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
     ports:
       - "54320:3000"
@@ -64,12 +64,13 @@ services:
       GOTRUE_DB_DATABASE_URL: postgres://postgres:postgres@supabase-db:5432/supabase?sslmode=disable
       GOTRUE_SITE_URL: http://localhost:5173
       GOTRUE_URI_ALLOW_LIST: "http://localhost:5173,http://localhost:3000"
-      GOTRUE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
       GOTRUE_JWT_EXP: 3600
       GOTRUE_JWT_AUD: authenticated
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
       GOTRUE_DISABLE_SIGNUP: false
       GOTRUE_EXTERNAL_EMAIL_DISABLED: true
+      API_EXTERNAL_URL: http://localhost:54321
     ports:
       - "54321:9999"
     depends_on:
@@ -87,8 +88,8 @@ services:
       DEFAULT_PROJECT_NAME: "Time Tracking App"
       SUPABASE_URL: http://localhost:54321
       SUPABASE_REST_URL: http://localhost:54320
-      SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0}
-      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU}
+      SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
     ports:
       - "54323:3000"
 

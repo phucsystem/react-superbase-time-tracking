@@ -2,6 +2,8 @@
 -- Time Tracking Database Schema
 -- =========================================
 
+CREATE SCHEMA IF NOT EXISTS auth;
+
 -- Create vendors table
 CREATE TABLE IF NOT EXISTS vendors (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

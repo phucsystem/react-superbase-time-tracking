@@ -3,11 +3,11 @@
 # Development commands
 dev:
 	@echo "Starting development environment..."
-	docker-compose --env-file .env.development up
+	docker-compose up
 
 dev-build:
 	@echo "Building and starting development environment..."
-	docker-compose --env-file .env.development up --build
+	docker-compose up --build
 
 dev-down:
 	@echo "Stopping development environment..."
@@ -16,11 +16,11 @@ dev-down:
 # Production commands
 prod:
 	@echo "Starting production environment..."
-	docker-compose -f docker-compose-production.yml --env-file .env.production up
+	docker-compose -f docker-compose-production.yml up
 
 prod-build:
 	@echo "Building and starting production environment..."
-	docker-compose -f docker-compose-production.yml --env-file .env.production up --build
+	docker-compose -f docker-compose-production.yml up --build
 
 prod-down:
 	@echo "Stopping production environment..."
@@ -59,15 +59,15 @@ setup-prod:
 db-init:
 	@echo "Initializing database from scratch..."
 	@echo "Stopping all services..."
-	docker-compose --env-file .env.development down -v
+	docker-compose down -v
 	@echo "Removing database volume..."
 	docker volume rm react-superbase-time-tracking_postgres_data 2>/dev/null || true
 	@echo "Starting database service only..."
-	docker-compose --env-file .env.development up -d supabase-db
+	docker-compose up -d supabase-db
 	@echo "Waiting for database to be ready..."
 	@sleep 15
 	@echo "Checking database logs..."
-	docker-compose --env-file .env.development logs supabase-db | tail -10
+	docker-compose logs supabase-db | tail -10
 	@echo "Database initialized with complete schema and sample data!"
 	@echo "You can now start the full environment with 'make dev' or 'make dev-build'"
 
