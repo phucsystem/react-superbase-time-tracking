@@ -3,9 +3,27 @@
 -- =========================================
 
 -- Create roles for PostgREST
-CREATE ROLE IF NOT EXISTS anon NOLOGIN;
-CREATE ROLE IF NOT EXISTS authenticated NOLOGIN;
-CREATE ROLE IF NOT EXISTS service_role NOLOGIN;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+    CREATE ROLE anon NOLOGIN;
+  END IF;
+END
+$$;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+    CREATE ROLE authenticated NOLOGIN;
+  END IF;
+END
+$$;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'service_role') THEN
+    CREATE ROLE service_role NOLOGIN;
+  END IF;
+END
+$$;
 
 -- Grant usage on schema
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
