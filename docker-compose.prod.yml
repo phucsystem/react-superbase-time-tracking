@@ -98,5 +98,42 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # Supabase Studio
+  supabase-studio:
+    image: supabase/studio:20240326-5e5586d
+    container_name: supabase-studio
+    environment:
+      STUDIO_PG_META_URL: http://supabase-meta:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DEFAULT_ORGANIZATION_NAME: "Production"
+      DEFAULT_PROJECT_NAME: "Time Tracking App"
+      SUPABASE_URL: http://supabase-auth:9999
+      SUPABASE_REST_URL: http://supabase-rest:3000
+      SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+    ports:
+      - "54323:3000"
+    depends_on:
+      - supabase-meta
+    restart: unless-stopped
+
+  # Supabase Meta API (for Studio)
+  supabase-meta:
+    image: supabase/postgres-meta:v0.75.0
+    container_name: supabase-meta
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: supabase-db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: supabase
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "54324:8080"
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres_data:
