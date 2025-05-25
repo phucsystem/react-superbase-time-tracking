@@ -24,6 +24,8 @@ services:
       - NODE_ENV=production
       - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
       - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+    ports:
+      - "8888:8888"  
     depends_on:
       supabase-db:
         condition: service_healthy
