@@ -27,7 +27,7 @@ sudo apt update
 
 # Stop existing containers
 echo "🛑 Stopping existing containers..."
-docker-compose -f docker-compose.prod.yml down || true
+docker compose -f docker-compose.prod.yml down || true
 
 # Remove old images (optional - uncomment to save space)
 # echo "🗑️ Removing old images..."
@@ -35,7 +35,7 @@ docker-compose -f docker-compose.prod.yml down || true
 
 # Build and start containers
 echo "🏗️ Building and starting containers..."
-docker-compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 
 # Wait for services to be healthy
 echo "⏳ Waiting for services to start..."
@@ -43,11 +43,11 @@ sleep 30
 
 # Check if services are running
 echo "🔍 Checking service status..."
-docker-compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml ps
 
 # Test database connection
 echo "🔌 Testing database connection..."
-docker-compose -f docker-compose.prod.yml exec -T supabase-db pg_isready -U postgres
+docker compose -f docker-compose.prod.yml exec -T supabase-db pg_isready -U postgres
 
 # Test API endpoint
 echo "🌐 Testing API endpoint..."
@@ -61,7 +61,7 @@ echo "   - Frontend: http://your-server-ip"
 echo "   - API: http://your-server-ip/api/rest/v1/"
 echo ""
 echo "📊 To view logs:"
-echo "   docker-compose -f docker-compose.prod.yml logs -f"
+echo "   docker compose -f docker-compose.prod.yml logs -f"
 echo ""
 echo "🔧 To access database:"
-echo "   docker-compose -f docker-compose.prod.yml exec supabase-db psql -U postgres -d supabase"
+echo "   docker compose -f docker-compose.prod.yml exec supabase-db psql -U postgres -d supabase"
