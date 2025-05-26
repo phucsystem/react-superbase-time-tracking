@@ -4,6 +4,7 @@ import { Task, TimeEntry, Vendor } from '../types'
 import LogWorkForm from '../components/LogWorkForm'
 import LogWorkList from '../components/LogWorkList'
 import { Calendar, Clock, User } from 'lucide-react'
+import { useAuth } from '../hooks/useAuth'
 
 const LogWork = () => {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -14,6 +15,7 @@ const LogWork = () => {
   const [showLogForm, setShowLogForm] = useState(false)
   const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null)
   const [loading, setLoading] = useState(true)
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchVendors()
@@ -50,7 +52,12 @@ const LogWork = () => {
         .order('name', { ascending: true })
 
       if (error) throw error
-      setVendors(data || [])
+      let filtered = data || [];
+      if (user && user.user_metadata?.role !== 'admin') {
+        filtered = filtered.filter((v: Vendor) => v.email === user.email)
+        setSelectedVendorId(filtered[0].id)
+      }
+      setVendors(filtered)
     } catch (error) {
       console.error('Error fetching vendors:', error)
     }

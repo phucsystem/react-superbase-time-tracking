@@ -1,11 +1,34 @@
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Clock, CheckSquare, BarChart3, Users, FolderOpen, FileText, LogOut } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
+import { supabase } from '../utils/supabase'
 
 const Navbar = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
+  const [vendorName, setVendorName] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchVendorName = async () => {
+      if (user && user.user_metadata?.role === 'vendor') {
+        const { data: vendorData, error } = await supabase
+          .from('vendors')
+          .select('name')
+          .eq('email', user.email)
+          .single()
+        if (!error && vendorData?.name) {
+          setVendorName(vendorData.name)
+        } else {
+          setVendorName(null)
+        }
+      } else {
+        setVendorName(null)
+      }
+    }
+    fetchVendorName()
+  }, [user])
 
   console.log(user)
 
@@ -37,6 +60,9 @@ const Navbar = () => {
             <span className="text-xl font-bold text-gray-800">TimeTracker</span>
           </div>
           <div className="flex space-x-4 items-center">
+          {user && user.user_metadata?.role === 'vendor' && vendorName && (
+              <span className="text-sm text-gray-700 font-medium mr-1">Hello, {vendorName}</span>
+            )}
             {filteredNavItems.map(({ path, label, icon: Icon }) => (
               <Link
                 key={path}
@@ -51,6 +77,8 @@ const Navbar = () => {
                 <span>{label}</span>
               </Link>
             ))}
+            {/* Display Hello, vendor name for vendor users */}
+            
             {user && (
               <button
                 onClick={handleLogout}

@@ -4,12 +4,15 @@ import { Task } from '../types'
 import { supabase } from '../utils/supabase'
 import TaskForm from '../components/TaskForm'
 import TaskList from '../components/TaskList'
+import { useAuth } from '../hooks/useAuth'
 
 const Tasks = () => {
   const [tasks, setTasks] = useState<Task[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [loading, setLoading] = useState(true)
+  const [vendorName, setVendorName] = useState<string | null>(null)
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchTasks()
@@ -17,13 +20,37 @@ const Tasks = () => {
 
   const fetchTasks = async () => {
     try {
+      let vendorId: string | undefined = undefined;
+      let fetchedVendorName: string | null = null;
+      if (user && user.user_metadata?.role === 'vendor') {
+        // Fetch vendor by user.email
+        const { data: vendorData, error: vendorError } = await supabase
+          .from('vendors')
+          .select('id, email, name')
+          .eq('email', user.email)
+          .single();
+        if (vendorError) throw vendorError;
+        vendorId = vendorData?.id;
+        fetchedVendorName = vendorData?.name || null;
+      }
+
+      setVendorName(fetchedVendorName);
+
       const { data, error } = await supabase
         .from('tasks')
-        .select('*')
+        .select(`*, vendors(name), projects(name)`)
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setTasks(data || [])
+      let filteredTasks = (data || []).map((task: any) => ({
+        ...task,
+        vendor_name: task.vendors ? task.vendors.name : undefined,
+        project_name: task.projects ? task.projects.name : undefined,
+      }));
+      if (vendorId) {
+        filteredTasks = filteredTasks.filter((task: Task & { vendor_id: string }) => task.vendor_id === vendorId);
+      }
+      setTasks(filteredTasks)
     } catch (error) {
       console.error('Error fetching tasks:', error)
     } finally {

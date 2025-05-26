@@ -31,6 +31,9 @@ const TaskList = ({ tasks, onEdit, onDelete, onStartTimer }: TaskListProps) => {
                 Project
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Vendor
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Created
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -52,7 +55,10 @@ const TaskList = ({ tasks, onEdit, onDelete, onStartTimer }: TaskListProps) => {
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {task.project || '-'}
+                  {task.project_name || '-'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {task.vendor_name || '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {format(new Date(task.created_at), 'MMM d, yyyy')}
