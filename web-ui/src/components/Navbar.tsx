@@ -10,9 +10,9 @@ const Navbar = () => {
   console.log(user)
 
   const navItems = [
+    { path: '/', label: 'Dashboard', icon: Clock },
     { path: '/log-work', label: 'My Log Work', icon: FileText },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
-    { path: '/', label: 'Dashboard', icon: Clock },
     { path: '/vendors', label: 'Vendors', icon: Users },
     { path: '/projects', label: 'Projects', icon: FolderOpen },
     { path: '/reports', label: 'Reports', icon: BarChart3 },

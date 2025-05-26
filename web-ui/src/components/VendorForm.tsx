@@ -18,10 +18,12 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
   })
   const [selectedProjects, setSelectedProjects] = useState<string[]>([])
   const [availableProjects, setAvailableProjects] = useState<Project[]>([])
+  const [availableUsers, setAvailableUsers] = useState<{ id: string; email: string }[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetchProjects()
+    fetchVendorUsers()
     if (vendor) {
       setFormData({
         name: vendor.name,
@@ -48,6 +50,20 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
     }
   }
 
+  const fetchVendorUsers = async () => {
+    const { data, error } = await supabase
+      .from('vendor_auth_users')
+      .select('id, email, raw_user_meta_data')
+    if (error) {
+      console.error('Error fetching users:', error)
+      setAvailableUsers([])
+      return
+    }
+    setAvailableUsers(
+      (data || []).map((u: any) => ({ id: u.id, email: u.email }))
+    )
+  }
+
   const handleProjectToggle = (projectId: string) => {
     setSelectedProjects((prev: string[]) =>
       prev.includes(projectId)
@@ -64,7 +80,9 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
       const vendorData: any = {
         name: formData.name,
         email: formData.email,
-        rate_per_hour: formData.rate_per_hour ? parseFloat(formData.rate_per_hour) : null,
+        rate_per_hour: formData.rate_per_hour
+          ? parseVND(formData.rate_per_hour)
+          : null,
       }
       if (!vendor && formData.password) {
         vendorData.password = formData.password
@@ -153,42 +171,31 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email *
+              Vendor Email *
             </label>
-            <input
-              type="email"
+            <select
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            >
+              <option value="">Select a vendor email</option>
+              {availableUsers.map((user) => (
+                <option key={user.id} value={user.email}>{user.email}</option>
+              ))}
+            </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Rate per Hour ($)
+              Rate per Hour (VND)
             </label>
             <input
-              type="number"
-              step="0.01"
-              min="0"
+              type="text"
               value={formData.rate_per_hour}
               onChange={(e) => setFormData({ ...formData, rate_per_hour: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password {vendor ? '' : '*'}
-            </label>
-            <input
-              type="password"
-              required={!vendor}
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={vendor ? 'Leave blank to keep unchanged' : ''}
+              placeholder="e.g. 200k, 100000"
             />
           </div>
 
@@ -239,6 +246,17 @@ const VendorForm = ({ vendor, onSave, onCancel }: VendorFormProps) => {
       </div>
     </div>
   )
+}
+
+function parseVND(value: string): number {
+  // Remove spaces, lowercase, and handle 'k' for thousands
+  const cleaned = value.replace(/\s+/g, '').toLowerCase()
+  if (cleaned.endsWith('k')) {
+    const num = parseFloat(cleaned.slice(0, -1))
+    if (!isNaN(num)) return num * 1000
+  }
+  const num = parseInt(cleaned, 10)
+  return isNaN(num) ? 0 : num
 }
 
 export default VendorForm

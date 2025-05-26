@@ -15,9 +15,9 @@ function ProtectedRoute({ children, allowedRoles }: { children: JSX.Element, all
   if (!user) {
     return <Navigate to="/login" replace />
   }
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && !allowedRoles.includes(user.user_metadata.role)) {
     // If user is vendor and not allowed, redirect to /log-work
-    if (user.role === 'vendor') {
+    if (user.user_metadata.role === 'vendor') {
       return <Navigate to="/log-work" replace />
     }
     // Otherwise, redirect to dashboard
