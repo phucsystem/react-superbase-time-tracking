@@ -46,7 +46,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
   }
 
   const signUp = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({ email, password, email_confirm: true })
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      email_confirm: true,
+      options: {
+        data: { role: 'vendor' }
+      }
+    })
     if (!error) {
       // Immediately sign in after successful registration
       return await signIn(email, password)

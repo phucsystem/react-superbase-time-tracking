@@ -10,10 +10,18 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 
-function ProtectedRoute({ children }: { children: JSX.Element }) {
+function ProtectedRoute({ children, allowedRoles }: { children: JSX.Element, allowedRoles?: string[] }) {
   const { user } = useAuth()
   if (!user) {
     return <Navigate to="/login" replace />
+  }
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    // If user is vendor and not allowed, redirect to /log-work
+    if (user.role === 'vendor') {
+      return <Navigate to="/log-work" replace />
+    }
+    // Otherwise, redirect to dashboard
+    return <Navigate to="/" replace />
   }
   return children
 }
@@ -30,12 +38,12 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
-              <Route path="/log-work" element={<ProtectedRoute><LogWork /></ProtectedRoute>} />
-              <Route path="/vendors" element={<ProtectedRoute><Vendors /></ProtectedRoute>} />
-              <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-              <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+              <Route path="/" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Dashboard />} />} />
+              <Route path="/tasks" element={<ProtectedRoute children={<Tasks />} />} />
+              <Route path="/log-work" element={<ProtectedRoute children={<LogWork />} />} />
+              <Route path="/vendors" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Vendors />} />} />
+              <Route path="/projects" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Projects />} />} />
+              <Route path="/reports" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Reports />} />} />
             </Routes>
           </main>
         </div>

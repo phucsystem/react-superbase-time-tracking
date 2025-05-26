@@ -7,14 +7,21 @@ const Navbar = () => {
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
 
+  console.log(user)
+
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: Clock },
     { path: '/log-work', label: 'My Log Work', icon: FileText },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
+    { path: '/', label: 'Dashboard', icon: Clock },
     { path: '/vendors', label: 'Vendors', icon: Users },
     { path: '/projects', label: 'Projects', icon: FolderOpen },
     { path: '/reports', label: 'Reports', icon: BarChart3 },
   ]
+
+  // Only allow certain nav items for vendor
+  const filteredNavItems = user && user.user_metadata && user.user_metadata.role === 'vendor'
+    ? navItems.filter(item => ['/log-work', '/tasks'].includes(item.path))
+    : navItems
 
   const handleLogout = async () => {
     await signOut()
@@ -30,7 +37,7 @@ const Navbar = () => {
             <span className="text-xl font-bold text-gray-800">TimeTracker</span>
           </div>
           <div className="flex space-x-4 items-center">
-            {navItems.map(({ path, label, icon: Icon }) => (
+            {filteredNavItems.map(({ path, label, icon: Icon }) => (
               <Link
                 key={path}
                 to={path}
