@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Task, Vendor } from "../types";
 import { supabase } from "../utils/supabase";
+import { useAuth } from "../hooks/useAuth";
 
 interface TaskFormProps {
   task?: Task | null;
@@ -10,6 +11,7 @@ interface TaskFormProps {
 }
 
 const TaskForm = ({ task, onSave, onCancel }: TaskFormProps) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -19,6 +21,7 @@ const TaskForm = ({ task, onSave, onCancel }: TaskFormProps) => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const isVendorUser = user && user.user_metadata?.role === "vendor";
 
   useEffect(() => {
     fetchVendors();
@@ -30,7 +33,7 @@ const TaskForm = ({ task, onSave, onCancel }: TaskFormProps) => {
         vendor_id: task.vendor_id,
       });
     }
-  }, [task]);
+  }, [task, user]);
 
   useEffect(() => {
     if (formData.vendor_id) {
@@ -49,7 +52,15 @@ const TaskForm = ({ task, onSave, onCancel }: TaskFormProps) => {
         .order("name");
 
       if (error) throw error;
-      setVendors(data || []);
+      let filteredVendors = data || [];
+      if (isVendorUser) {
+        filteredVendors = filteredVendors.filter((v: Vendor) => v.email === user.email);
+        // Preselect and lock vendor if vendor user
+        if (filteredVendors.length > 0) {
+          setFormData((prev: any) => ({ ...prev, vendor_id: filteredVendors[0].id }));
+        }
+      }
+      setVendors(filteredVendors);
     } catch (error) {
       console.error("Error fetching vendors:", error);
     }
@@ -128,6 +139,7 @@ const TaskForm = ({ task, onSave, onCancel }: TaskFormProps) => {
                 setFormData({ ...formData, vendor_id: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isVendorUser}
             >
               <option value="">Select a vendor</option>
               {vendors.map((vendor) => (
