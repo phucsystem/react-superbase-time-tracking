@@ -49,41 +49,17 @@ setup-dev:
 
 setup-prod:
 	@echo "Setting up production environment..."
-	@if [ ! -f .env.production ]; then \
-		echo "Please create .env.production from .env.production.example"; \
-		exit 1; \
-	fi
 	make prod-build
 
 # Database commands
-db-init:
-	@echo "Initializing database from scratch..."
-	@echo "Stopping all services..."
-	docker compose down -v
-	@echo "Removing database volume..."
-	docker volume rm react-superbase-time-tracking_postgres_data 2>/dev/null || true
-	@echo "Starting database service only..."
-	docker compose up -d supabase-db
-	@echo "Waiting for database to be ready..."
-	@sleep 15
-	@echo "Checking database logs..."
-	docker compose logs supabase-db | tail -10
-	@echo "Database initialized with complete schema and sample data!"
-	@echo "You can now start the full environment with 'make dev' or 'make dev-build'"
-
 db-reset:
 	@echo "Resetting development database..."
 	docker compose down -v
 	docker volume rm react-superbase-time-tracking_postgres_data 2>/dev/null || true
-	make dev-build
 
 db-backup:
 	@echo "Creating database backup..."
 	docker compose exec supabase-db pg_dump -U postgres supabase > backup_$(shell date +%Y%m%d_%H%M%S).sql
-
-db-init-sql:
-	@echo "Running init.sql on supabase-db..."
-	docker compose exec supabase-db psql -U postgres -d supabase -f /docker-entrypoint-initdb.d/01-init.sql
 
 # Help
 help:

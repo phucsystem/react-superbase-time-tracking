@@ -48,7 +48,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./supabase/init.sql:/docker-entrypoint-initdb.d/01-init.sql
-      - ./supabase/backup:/backup
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -81,16 +80,17 @@ services:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@supabase-db:5432/supabase?sslmode=disable
-      GOTRUE_SITE_URL: http://your-domain.com
-      GOTRUE_URI_ALLOW_LIST: "http://your-domain.com,https://your-domain.com"
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@supabase-db:5432/supabase?sslmode=disable&search_path=auth,public
+      GOTRUE_SITE_URL: ${SITE_URL}
+      GOTRUE_URI_ALLOW_LIST: ${URI_ALLOW_LIST}
       GOTRUE_JWT_SECRET: ${JWT_SECRET}
       GOTRUE_JWT_EXP: 3600
       GOTRUE_JWT_AUD: authenticated
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
       GOTRUE_DISABLE_SIGNUP: "false"
-      GOTRUE_EXTERNAL_EMAIL_DISABLED: "false"
-      API_EXTERNAL_URL: http://your-domain.com:54321
+      GOTRUE_EXTERNAL_EMAIL_DISABLED: "true"
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      API_EXTERNAL_URL: ${SITE_URL}:54321
     ports:
       - "54321:9999"
     depends_on:
