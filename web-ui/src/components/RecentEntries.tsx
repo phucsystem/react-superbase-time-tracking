@@ -32,7 +32,7 @@ const RecentEntries = ({ entries }: RecentEntriesProps) => {
         {entries.map((entry) => (
           <div key={entry.id} className="p-4">
             <div className="flex justify-between items-start">
-              <div className="flex-1">
+              <div className="flex-1 space-y-1">
                 <h4 className="text-sm font-medium text-gray-900">
                   {(entry as any).tasks?.title || 'Unknown Task'}
                 </h4>
@@ -41,9 +41,13 @@ const RecentEntries = ({ entries }: RecentEntriesProps) => {
                     {(entry as any).tasks.project}
                   </p>
                 )}
-                <p className="text-xs text-gray-400 mt-1">
-                  {format(new Date(entry.start_time), 'MMM d, h:mm a')}
-                  {entry.end_time && ` - ${format(new Date(entry.end_time), 'h:mm a')}`}
+                {(entry as any).vendors?.name && (
+                  <p className="text-xs text-gray-500">
+                    Vendor: <b>{(entry as any).vendors.name}</b>
+                  </p>
+                )}
+                <p className="text-xs text-gray-400">
+                  {format(new Date(entry.start_time), 'MMM d, yyyy')}
                 </p>
               </div>
               <div className="text-sm font-medium text-gray-900">

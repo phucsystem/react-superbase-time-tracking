@@ -1,4 +1,4 @@
-import { Edit, Trash2, Play } from 'lucide-react'
+import { Edit, Trash2 } from 'lucide-react'
 import { Task } from '../types'
 import { format } from 'date-fns'
 
@@ -6,10 +6,9 @@ interface TaskListProps {
   tasks: Task[]
   onEdit: (task: Task) => void
   onDelete: (taskId: string) => void
-  onStartTimer?: (task: Task) => void
 }
 
-const TaskList = ({ tasks, onEdit, onDelete, onStartTimer }: TaskListProps) => {
+const TaskList = ({ tasks, onEdit, onDelete }: TaskListProps) => {
   if (tasks.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -58,22 +57,13 @@ const TaskList = ({ tasks, onEdit, onDelete, onStartTimer }: TaskListProps) => {
                   {task.project_name || '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {task.vendor_name || '-'}
+                  {(task as any).vendors?.name || '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {format(new Date(task.created_at), 'MMM d, yyyy')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end space-x-2">
-                    {onStartTimer && (
-                      <button
-                        onClick={() => onStartTimer(task)}
-                        className="text-green-600 hover:text-green-900"
-                        title="Start Timer"
-                      >
-                        <Play className="h-4 w-4" />
-                      </button>
-                    )}
                     <button
                       onClick={() => onEdit(task)}
                       className="text-blue-600 hover:text-blue-900"
