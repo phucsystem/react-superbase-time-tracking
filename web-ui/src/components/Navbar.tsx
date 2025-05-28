@@ -61,7 +61,10 @@ const Navbar = () => {
           </div>
           <div className="flex space-x-4 items-center">
           {user && user.user_metadata?.role === 'vendor' && vendorName && (
-              <span className="text-sm text-gray-700 font-medium mr-1">Hello, {vendorName}</span>
+              <span className="text-sm text-gray-700 font-bold mr-1">Hello, {vendorName}</span>
+            )}
+            {user && user.user_metadata?.role === 'admin' && (
+              <span className="text-sm text-gray-700 font-bold mr-1">Hello, Admin</span>
             )}
             {filteredNavItems.map(({ path, label, icon: Icon }) => (
               <Link
@@ -77,7 +80,6 @@ const Navbar = () => {
                 <span>{label}</span>
               </Link>
             ))}
-            {/* Display Hello, vendor name for vendor users */}
             
             {user && (
               <button

@@ -24,8 +24,8 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <div className="min-h-screen flex items-start justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-md mt-32">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
