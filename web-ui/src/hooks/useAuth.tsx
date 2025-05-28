@@ -14,34 +14,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    // Check for session in localStorage
-    const session = localStorage.getItem('sb-session')
-    if (session) {
-      setUser(JSON.parse(session))
-    }
-    // Listen for auth changes
-    const { data: listener } = supabase.auth.onAuthStateChange((
-      _event: string, session: any
-    ) => {
-      if (session?.user) {
-        setUser(session.user)
-        localStorage.setItem('sb-session', JSON.stringify(session.user))
-      } else {
-        setUser(null)
-        localStorage.removeItem('sb-session')
-      }
-    })
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+    getSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
     return () => {
-      listener.subscription.unsubscribe()
+      listener.subscription.unsubscribe();
     }
   }, [])
 
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (data?.user) {
-      setUser(data.user)
-      localStorage.setItem('sb-session', JSON.stringify(data.user))
-    }
+    // No need to manually set user; listener will handle it
     return { error }
   }
 
@@ -63,8 +53,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
 
   const signOut = async () => {
     await supabase.auth.signOut()
-    setUser(null)
-    localStorage.removeItem('sb-session')
+    // No need to manually set user; listener will handle it
   }
 
   return (

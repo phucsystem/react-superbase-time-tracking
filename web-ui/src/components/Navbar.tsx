@@ -30,8 +30,6 @@ const Navbar = () => {
     fetchVendorName()
   }, [user])
 
-  console.log(user)
-
   const navItems = [
     { path: '/', label: 'Dashboard', icon: Clock },
     { path: '/log-work', label: 'My Log Work', icon: FileText },

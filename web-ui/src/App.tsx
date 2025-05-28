@@ -1,3 +1,4 @@
+import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
 import Tasks from './pages/Tasks'
@@ -26,24 +27,32 @@ function ProtectedRoute({ children, allowedRoles }: { children: JSX.Element, all
   return children
 }
 
+function DefaultRoute() {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.user_metadata?.role === 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <Navigate to="/log-work" replace />;
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-100">
-          <AuthWrapper>
-            <Navbar />
-          </AuthWrapper>
+          <AuthWrapper children={<Navbar />} />
           <main className="container mx-auto px-4 py-8">
             <Routes>
-              <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Dashboard />} />} />
+              <Route path="/" element={<ProtectedRoute children={<DefaultRoute />} />} />
+              <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Dashboard />} />} />
               <Route path="/tasks" element={<ProtectedRoute children={<Tasks />} />} />
               <Route path="/log-work" element={<ProtectedRoute children={<LogWork />} />} />
               <Route path="/vendors" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Vendors />} />} />
               <Route path="/projects" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Projects />} />} />
               <Route path="/reports" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Reports />} />} />
+              <Route path="/login" element={<Login />} />
             </Routes>
           </main>
         </div>
