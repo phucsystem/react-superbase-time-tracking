@@ -61,6 +61,14 @@ db-backup:
 	@echo "Creating database backup..."
 	docker compose exec supabase-db pg_dump -U postgres supabase > backup_$(shell date +%Y%m%d_%H%M%S).sql
 
+db-restore:
+	@if [ -z "$$f" ]; then \
+		echo "Usage: make db-restore f=backup_file.sql"; \
+		exit 1; \
+	fi; \
+	echo "Restoring database from $$f..."; \
+	docker compose exec -T supabase-db psql -U postgres -d supabase < "$$f"
+
 # Help
 help:
 	@echo "Available commands:"
@@ -78,6 +86,7 @@ help:
 	@echo "  db-init      - Initialize database from scratch"
 	@echo "  db-reset     - Reset development database"
 	@echo "  db-backup    - Backup development database"
+	@echo "  db-restore   - Restore development database from a backup file (usage: make db-restore f=backup_file.sql)"
 	@echo "  db-check     - Check database tables and sample data"
 	@echo "  db-init-sql  - Run init.sql on supabase-db"
 	@echo "  init-admin-user - Run admin user initialization script"
