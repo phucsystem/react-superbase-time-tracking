@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabase'
 import { TimeEntry } from '../types'
-import { X, Clock, FileText } from 'lucide-react'
+import { X, Clock, FileText, Calendar } from 'lucide-react'
+import dayjs from 'dayjs'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 interface LogWorkFormProps {
   taskId: string
@@ -16,14 +19,18 @@ const LogWorkForm = ({ taskId, vendorId, editingEntry, onSubmit, onCancel }: Log
   const [description, setDescription] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [workedDate, setWorkedDate] = useState<dayjs.Dayjs | null>(dayjs())
 
   useEffect(() => {
     if (editingEntry) {
       setHours(editingEntry.duration ? (editingEntry.duration / 3600).toString() : '')
       setDescription(editingEntry.description || '')
+      setWorkedDate(editingEntry.worked_date ? dayjs(editingEntry.worked_date) : dayjs())
     } else {
       setHours('')
       setDescription('')
+      setWorkedDate(dayjs())
     }
   }, [editingEntry])
 
@@ -50,7 +57,8 @@ const LogWorkForm = ({ taskId, vendorId, editingEntry, onSubmit, onCancel }: Log
         end_time: now,
         duration: durationInSeconds,
         description: description.trim() || null,
-        updated_at: now
+        updated_at: now,
+        worked_date: workedDate ? workedDate.format('YYYY-MM-DD') : null,
       }
 
       if (editingEntry) {
@@ -102,6 +110,29 @@ const LogWorkForm = ({ taskId, vendorId, editingEntry, onSubmit, onCancel }: Log
               <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Log work date
+            </label>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                value={workedDate}
+                onChange={(date) => setWorkedDate(date)}
+                minDate={dayjs().subtract(2, 'day')}
+                maxDate={dayjs()}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: 'small',
+                    InputProps: {
+                      startAdornment: <Calendar className="h-4 w-4 text-gray-400 mr-2" />,
+                    },
+                  },
+                }}
+              />
+            </LocalizationProvider>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -47,6 +47,7 @@ export interface TimeEntry {
   description?: string
   created_at: string
   updated_at: string
+  worked_date?: string
 }
 
 export interface TimeReport {
