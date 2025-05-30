@@ -5,7 +5,6 @@ import Tasks from './pages/Tasks'
 import LogWork from './pages/LogWork'
 import Vendors from './pages/Vendors'
 import Projects from './pages/Projects'
-import Reports from './pages/Reports'
 import Navbar from './components/Navbar'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -51,7 +50,6 @@ function App() {
               <Route path="/log-work" element={<ProtectedRoute children={<LogWork />} />} />
               <Route path="/vendors" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Vendors />} />} />
               <Route path="/projects" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Projects />} />} />
-              <Route path="/reports" element={<ProtectedRoute allowedRoles={['admin', 'manager']} children={<Reports />} />} />
               <Route path="/login" element={<Login />} />
             </Routes>
           </main>
