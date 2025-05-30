@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { Calendar, Download } from 'lucide-react'
 import { TimeReport, TimeEntry, Vendor, Project } from '../types'
 import { supabase } from '../utils/supabase'
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths } from 'date-fns'
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, getISOWeek, getYear } from 'date-fns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, Legend, ReferenceLine } from 'recharts';
 
 const Reports = () => {
   const [reports, setReports] = useState<TimeReport[]>([])
@@ -84,6 +85,7 @@ const Reports = () => {
             id,
             title,
             project,
+            project_id,
             vendor_id
           )
         `)
@@ -202,6 +204,39 @@ const Reports = () => {
   const beforeLast = subMonths(now, 2);
   const beforeLastMonthLabel = format(beforeLast, 'MMMM yyyy');
 
+  // Helper: get week label for a date (compact date range)
+  const getWeekLabel = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const weekStart = startOfWeek(date, { weekStartsOn: 1 }); // Monday
+    const weekEnd = endOfWeek(date, { weekStartsOn: 1 }); // Sunday
+    return `${format(weekStart, 'MM/dd')}-${format(weekEnd, 'MM/dd')}`;
+  };
+
+  // Group filteredEntries by week and vendor
+  const weekVendorMap: Record<string, Record<string, number>> = {};
+  filteredEntries.forEach((entry: any) => {
+    const vendorId = entry.tasks?.vendor_id || entry.tasks?.vendor;
+    if (!vendorId) return;
+    const week = getWeekLabel(entry.start_time);
+    if (!weekVendorMap[week]) weekVendorMap[week] = {};
+    weekVendorMap[week][vendorId] = (weekVendorMap[week][vendorId] || 0) + (entry.duration || 0);
+  });
+  // Prepare chart data: [{ week: '2024-W23', vendor1: hours, vendor2: hours, ... }]
+  const weekKeys = Object.keys(weekVendorMap).sort();
+  const vendorIds = vendors.map(v => v.id);
+  const vendorIdToName: Record<string, string> = Object.fromEntries(vendors.map(v => [v.id, v.name || v.id]));
+  const vendorColors = [
+    '#8884d8', '#82ca9d', '#ffc658', '#ff7f50', '#a4de6c', '#d0ed57', '#8dd1e1', '#d88884', '#b0a4e3', '#e384d8',
+  ];
+  const vendorIdToColor: Record<string, string> = Object.fromEntries(vendorIds.map((id, idx) => [id, vendorColors[idx % vendorColors.length]]));
+  const weekChartData = weekKeys.map(week => {
+    const row: Record<string, any> = { week };
+    vendorIds.forEach(id => {
+      row[vendorIdToName[id]] = +(weekVendorMap[week][id] || 0) / 3600;
+    });
+    return row;
+  });
+
   if (loading) {
     return <div className="flex justify-center py-8">Loading...</div>
   }
@@ -268,6 +303,24 @@ const Reports = () => {
             <span>Export CSV</span>
           </button>
         </div>
+      </div>
+
+      {/* Vendor Worklog Bar Chart */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Worklog by Vendor</h3>
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={weekChartData} margin={{ top: 5, right: 20, left: 10, bottom: 20 }}>
+            <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+            <XAxis dataKey="week" />
+            <YAxis label={{ value: 'Hours', angle: -90, position: 'insideLeft' }} domain={[0, 20]} />
+            <Tooltip />
+            <Legend />
+            <ReferenceLine y={10} stroke="#ff0000" strokeDasharray="3 3" label={{ value: 'Target 10h', position: 'right', fill: '#ff0000', fontSize: 12 }} />
+            {vendorIds.map((id, idx) => (
+              <Bar key={id} dataKey={vendorIdToName[id]} fill={vendorIdToColor[id]} barSize={30} isAnimationActive={false} />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
