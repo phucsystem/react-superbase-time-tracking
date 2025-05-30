@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Clock, CheckSquare, BarChart3, Users, FolderOpen, FileText, LogOut } from 'lucide-react'
+import { Clock, CheckSquare, BarChart3, Users, FolderOpen, FileText, LogOut, Settings as SettingsIcon } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../utils/supabase'
 
@@ -34,9 +34,6 @@ const Navbar = () => {
     { path: '/', label: 'Dashboard', icon: Clock },
     { path: '/log-work', label: 'My Log Work', icon: FileText },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
-    { path: '/vendors', label: 'Vendors', icon: Users },
-    { path: '/projects', label: 'Projects', icon: FolderOpen },
-    { path: '/reports', label: 'Reports', icon: BarChart3 },
   ]
 
   // Only allow certain nav items for vendor
@@ -58,7 +55,7 @@ const Navbar = () => {
             <span className="text-xl font-bold text-gray-800">TimeTracker</span>
           </div>
           <div className="flex space-x-4 items-center">
-          {user && user.user_metadata?.role === 'vendor' && vendorName && (
+            {user && user.user_metadata?.role === 'vendor' && vendorName && (
               <span className="text-sm text-gray-700 font-bold mr-1">Hello, {vendorName}</span>
             )}
             {user && user.user_metadata?.role === 'admin' && (
@@ -78,7 +75,28 @@ const Navbar = () => {
                 <span>{label}</span>
               </Link>
             ))}
-            
+            {user && user.user_metadata?.role === 'admin' && (
+              <div className="relative group">
+                <button className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors focus:outline-none">
+                  <SettingsIcon className="h-4 w-4" />
+                  <span>Settings</span>
+                </button>
+                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity z-20">
+                  <Link
+                    to="/vendors"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"
+                  >
+                    <Users className="inline-block h-4 w-4 mr-2" />Vendors
+                  </Link>
+                  <Link
+                    to="/projects"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"
+                  >
+                    <FolderOpen className="inline-block h-4 w-4 mr-2" />Projects
+                  </Link>
+                </div>
+              </div>
+            )}
             {user && (
               <button
                 onClick={handleLogout}

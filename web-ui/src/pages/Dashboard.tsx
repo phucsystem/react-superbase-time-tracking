@@ -24,7 +24,7 @@ const Dashboard = () => {
   const [selectedVendor, setSelectedVendor] = useState<string | null>(null)
   const [projects, setProjects] = useState<Project[]>([])
   const [vendors, setVendors] = useState<Vendor[]>([])
-  const [activeTab, setActiveTab] = useState<'entries' | 'reports'>('entries')
+  const [activeTab, setActiveTab] = useState<'entries' | 'reports' | 'costs'>('entries')
 
   useEffect(() => {
     fetchData()
@@ -286,6 +286,12 @@ const Dashboard = () => {
         >
           Reports & Analytics
         </button>
+        <button
+          className={`px-4 py-2 font-medium ${activeTab === 'costs' ? 'border-b-2 border-blue-600 text-blue-700' : 'text-gray-500'}`}
+          onClick={() => setActiveTab('costs')}
+        >
+          Costs
+        </button>
       </div>
       {activeTab === 'entries' && (
         <div>
@@ -445,6 +451,91 @@ const Dashboard = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+      )}
+      {activeTab === 'costs' && (
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Vendor Costs</h2>
+          <div className="flex flex-wrap gap-4 mb-6 items-center justify-between">
+            <div className="flex flex-wrap gap-4">
+              <select
+                value={dateRange}
+                onChange={(e) => setDateRange(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="last_month">Last Month</option>
+                <option value="month_before_last">{beforeLastMonthLabel}</option>
+                <option value="custom">Custom Range</option>
+              </select>
+              {dateRange === 'custom' && (
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    label="Start date"
+                    value={customStart ? new Date(customStart) : null}
+                    onChange={date => setCustomStart(date ? date.toISOString().slice(0, 10) : '')}
+                    slotProps={{ textField: { size: 'small', className: 'bg-white' } }}
+                  />
+                  <span className="mx-2">to</span>
+                  <DatePicker
+                    label="End date"
+                    value={customEnd ? new Date(customEnd) : null}
+                    onChange={date => setCustomEnd(date ? date.toISOString().slice(0, 10) : '')}
+                    minDate={customStart ? new Date(customStart) : undefined}
+                    slotProps={{ textField: { size: 'small', className: 'bg-white' } }}
+                  />
+                </LocalizationProvider>
+              )}
+            </div>
+            {/* Total Cost Display */}
+            {(() => {
+              const vndFormatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+              const totalCost = vendors.reduce((sum, vendor) => {
+                const vendorEntries = filteredEntries.filter(e => e.vendor_id === vendor.id)
+                const totalSeconds = vendorEntries.reduce((s, e) => s + (e.duration || 0), 0)
+                const totalHours = totalSeconds / 3600
+                const rate = vendor.rate_per_hour || 0
+                return sum + totalHours * rate
+              }, 0)
+              return (
+                <div className="ml-auto">
+                  <span className="text-lg font-semibold text-gray-700 mr-2">Total Cost:</span>
+                  <span className="text-2xl font-bold text-blue-700">{vndFormatter.format(totalCost)}</span>
+                </div>
+              )
+            })()}
+          </div>
+          <div className="bg-white rounded-lg shadow overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Hours</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rate/Hour</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {vendors.map(vendor => {
+                  const vendorEntries = filteredEntries.filter(e => e.vendor_id === vendor.id)
+                  const totalSeconds = vendorEntries.reduce((sum, e) => sum + (e.duration || 0), 0)
+                  const totalHours = totalSeconds / 3600
+                  const rate = vendor.rate_per_hour || 0
+                  const cost = totalHours * rate
+                  const vndFormatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+                  return (
+                    <tr key={vendor.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{vendor.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{totalHours.toFixed(2)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{vndFormatter.format(rate)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-700">{vndFormatter.format(cost)}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
