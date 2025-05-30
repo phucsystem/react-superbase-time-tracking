@@ -67,6 +67,9 @@ db-restore:
 		exit 1; \
 	fi; \
 	echo "Restoring database from $$f..."; \
+	docker-compose up supabase-db -d
+	docker compose exec -T supabase-db psql -U postgres -c "DROP DATABASE IF EXISTS supabase;"
+	docker compose exec -T supabase-db psql -U postgres -c "CREATE DATABASE supabase;"
 	docker compose exec -T supabase-db psql -U postgres -d supabase < "$$f"
 
 # Help

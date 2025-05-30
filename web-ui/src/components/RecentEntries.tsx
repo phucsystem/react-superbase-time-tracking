@@ -28,31 +28,33 @@ const RecentEntries = ({ entries }: RecentEntriesProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow">
-      <div className="divide-y divide-gray-200">
-        {entries.map((entry) => (
-          <div key={entry.id} className="p-4">
-            <div className="flex justify-between items-start">
-              <div className="flex-1 space-y-1">
-                <h4 className="text-sm font-medium text-gray-900">
-                  {(entry as any).tasks?.title || 'Unknown Task'}
-                </h4>
-                {(entry as any).tasks?.project && (
-                  <p className="text-xs text-gray-500">
-                    {(entry as any).tasks.project}
-                  </p>
-                )}
-                {(entry as any).vendors?.name && (
-                  <p className="text-xs text-gray-500">
-                    Vendor: <b>{(entry as any).vendors.name}</b>
-                  </p>
-                )}
-                <p className="text-xs text-gray-400">
-                  {format(new Date(entry.start_time), 'MMM d, yyyy')}
-                </p>
-              </div>
-              <div className="text-sm font-medium text-gray-900">
-                {formatDuration(entry.duration)}
-              </div>
+      <div className="px-6 pt-6 pb-2 border-b border-gray-200 flex text-xs font-semibold text-gray-600">
+        <div className="w-1/4">Task</div>
+        <div className="w-1/5">Project</div>
+        <div className="w-1/5">Vendor</div>
+        <div className="w-1/5">Date</div>
+        <div className="w-1/6 text-right">Duration</div>
+      </div>
+      <div>
+        {entries.map((entry, idx) => (
+          <div
+            key={entry.id}
+            className={`flex items-center px-6 py-4 text-sm ${idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'} border-b last:border-b-0 border-gray-100`}
+          >
+            <div className="w-1/4 font-medium text-gray-900 truncate">
+              {(entry as any).tasks?.title || 'Unknown Task'}
+            </div>
+            <div className="w-1/5 text-gray-700 truncate">
+              {(entry as any).tasks?.projects?.name || (entry as any).tasks?.project || '-'}
+            </div>
+            <div className="w-1/5 text-gray-700 truncate">
+              {(entry as any).vendors?.name || '-'}
+            </div>
+            <div className="w-1/5 text-gray-500">
+              {format(new Date(entry.start_time), 'MMM d, yyyy')}
+            </div>
+            <div className="w-1/6 text-right font-semibold text-blue-700">
+              {formatDuration(entry.duration)}
             </div>
           </div>
         ))}
